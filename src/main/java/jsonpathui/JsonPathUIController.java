@@ -9,6 +9,8 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import jsonPath.JsonPath;
 import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
+
 import static jsonpathui.StyleJson.highlight;
 
 public class JsonPathUIController {
@@ -29,6 +31,8 @@ public class JsonPathUIController {
 
     @FXML
     void initialize() {
+        jsonText.setParagraphGraphicFactory(LineNumberFactory.get(jsonText));
+        result.setParagraphGraphicFactory(LineNumberFactory.get(result));
         result.replaceText("Ведите Json!");
         jsonText.textProperty().addListener((observable, oldValue, newValue) -> listnerJson(gson, newValue));
         jsonPath.setOnKeyTyped(keyEvent -> listnerJsonPath());
