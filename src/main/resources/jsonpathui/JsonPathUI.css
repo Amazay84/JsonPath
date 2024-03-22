@@ -1,3 +1,28 @@
-.json-property { -fx-fill: blue; }
-.json-number   { -fx-fill: purple; }
-.json-string   { -fx-fill: red; }
+#jsonText, #result {
+    -fx-font-family: 'System Regular';
+    -fx-font-size: 13;
+}
+
+#jsonPath {
+    -fx-font-size: 13;
+}
+
+.json-property {
+    -fx-fill: #8d32b1;
+}
+
+.json-number {
+    -fx-fill: #2a30b6;
+}
+
+.json-string {
+    -fx-fill: #c80000;
+}
+
+.json-boolean {
+    -fx-fill: #2a30b6;
+}
+
+.json-null {
+    -fx-fill: #a9522a;
+}

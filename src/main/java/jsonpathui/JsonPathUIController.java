@@ -21,37 +21,35 @@ public class JsonPathUIController {
     @FXML
     private CodeArea result;
 
-    private JsonElement json;
+    private JsonElement jsonNew;
+    private JsonElement jsonOld;
 
-    private Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
     @FXML
     void initialize() {
         result.replaceText("Ведите Json!");
-        jsonText.setStyle("-fx-font-family: 'System Regular'; -fx-font-size: 13");
-        result.setStyle("-fx-font-family: 'System Regular';-fx-font-size: 13");
-        jsonPath.setStyle("-fx-font-size: 13");
         jsonText.textProperty().addListener((observable, oldValue, newValue) -> listnerJson(gson, newValue));
         jsonPath.setOnKeyTyped(keyEvent -> listnerJsonPath());
         jsonPath.addEventFilter(MouseEvent.MOUSE_PRESSED, mouseEvent -> {
-            if (json != null) {
-                String prettyJson = gson.toJson(json);
+            if (jsonNew != null && jsonNew != jsonOld) {
+                String prettyJson = gson.toJson(jsonNew);
                 jsonText.replaceText(prettyJson);
-                //jsonText.setStyleSpans(0, highlight(prettyJson));
+                jsonOld = jsonNew;
             }
         });
     }
 
     private void listnerJson(Gson gson, String newValue) {
         try {
-            json = gson.fromJson(newValue, JsonElement.class);
+            jsonNew = gson.fromJson(newValue, JsonElement.class);
             jsonText.setStyleSpans(0, highlight(newValue));
         } catch (Exception e) {
-            json = null;
+            jsonNew = null;
             result.replaceText("Не валидный верный Json!");
             return;
         }
-        if (json != null && !json.isJsonNull()) {
+        if (jsonNew != null && !jsonNew.isJsonNull()) {
             if (!jsonPath.getText().isEmpty())
                 listnerJsonPath();
             else
@@ -61,9 +59,9 @@ public class JsonPathUIController {
     }
 
     private void listnerJsonPath() {
-        if (json != null) {
+        if (jsonNew != null) {
             try {
-                String resultStr = JsonPath.getValue(json, jsonPath.getText());
+                String resultStr = JsonPath.getValue(jsonNew, jsonPath.getText());
                 try {
                     JsonElement elem = gson.fromJson(resultStr, JsonElement.class);
                     if (!elem.isJsonPrimitive())

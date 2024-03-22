@@ -6,6 +6,8 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -31,9 +33,11 @@ public class JsonPathUI extends Application {
 
         anchorPane.getChildren().add(tabPane);
         URL cssResource = JsonPathUI.class.getResource("JsonPathUI.css");
+        Image image = new Image(JsonPathUI.class.getResource("JsonPathUI_icon.png").toString());
         Scene scene = new Scene(anchorPane, 1000, 700);
         scene.getStylesheets().add(cssResource.toExternalForm());
         stage.setTitle("JsonPathUI");
+        stage.getIcons().add(image);
         stage.setScene(scene);
         stage.show();
     }
