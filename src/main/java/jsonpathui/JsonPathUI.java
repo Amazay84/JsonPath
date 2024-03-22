@@ -1,13 +1,16 @@
 package jsonpathui;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -42,38 +45,60 @@ public class JsonPathUI extends Application {
         stage.show();
     }
 
-    private void createNewTab(String name)  {
+    private void createNewTab(String name) {
         FXMLLoader loader = new FXMLLoader(JsonPathUI.class.getResource("JsonPathUI.fxml"));
         Tab newTab = null;
         try {
             newTab = new Tab(name, loader.load());
+            newTab.closableProperty().set(true);
+            addRenamePropertyTab(newTab);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        newTab.closableProperty().set(true);
         controllersList.add(loader.getController());
         tabPane.getTabs().add(tabPane.getTabs().size() - 1, newTab);
         tabPane.getSelectionModel().selectPrevious();
     }
 
-    private void createFirstTab(String name)  {
+    private void createFirstTab(String name) {
         FXMLLoader loader = new FXMLLoader(JsonPathUI.class.getResource("JsonPathUI.fxml"));
         Tab newTab = null;
         try {
             newTab = new Tab(name, loader.load());
+            newTab.closableProperty().set(false);
+            addRenamePropertyTab(newTab);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        newTab.closableProperty().set(false);
         controllersList.add(loader.getController());
         tabPane.getTabs().add(newTab);
     }
 
-    private void createButtonNewTab(TabPane tabPane){
+    private void createButtonNewTab(TabPane tabPane) {
         Tab newTab = new Tab("+");
         newTab.setOnSelectionChanged(event ->
                 createNewTab("Tab " + tabPane.getTabs().size()));
-        tabPane.getTabs().add( newTab);
+        tabPane.getTabs().add(newTab);
+    }
+
+    private void addRenamePropertyTab(Tab tab) {
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem rename = new MenuItem("Rename");
+        contextMenu.getItems().add(rename);
+        final TextField textField = new TextField();
+        tab.setContextMenu(contextMenu);
+        rename.setOnAction(event -> {
+            tab.setGraphic(textField);
+            tab.setText("");
+            textField.selectAll();
+            textField.requestFocus();
+        });
+        textField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                tab.setText(textField.getText());
+                tab.setGraphic(null);
+            }
+        });
     }
 
     public static void main(String[] args) {
