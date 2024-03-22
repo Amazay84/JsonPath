@@ -52,6 +52,7 @@ public class JsonPathUI extends Application {
             newTab = new Tab(name, loader.load());
             newTab.closableProperty().set(true);
             addRenamePropertyTab(newTab);
+            newTab.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 14;");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -67,6 +68,7 @@ public class JsonPathUI extends Application {
             newTab = new Tab(name, loader.load());
             newTab.closableProperty().set(false);
             addRenamePropertyTab(newTab);
+            newTab.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 14;");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -76,6 +78,7 @@ public class JsonPathUI extends Application {
 
     private void createButtonNewTab(TabPane tabPane) {
         Tab newTab = new Tab("+");
+        newTab.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 14;");
         newTab.setOnSelectionChanged(event ->
                 createNewTab("Tab " + tabPane.getTabs().size()));
         tabPane.getTabs().add(newTab);
@@ -87,6 +90,7 @@ public class JsonPathUI extends Application {
         contextMenu.getItems().add(rename);
         final TextField textField = new TextField();
         tab.setContextMenu(contextMenu);
+        textField.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 13;");
         rename.setOnAction(event -> {
             tab.setGraphic(textField);
             tab.setText("");

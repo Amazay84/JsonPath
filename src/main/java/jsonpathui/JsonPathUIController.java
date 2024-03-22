@@ -3,6 +3,7 @@ package jsonpathui;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -36,6 +37,7 @@ public class JsonPathUIController {
                 String prettyJson = gson.toJson(jsonNew);
                 jsonText.replaceText(prettyJson);
                 jsonOld = jsonNew;
+                jsonText.setStyleSpans(0, highlight(prettyJson));
             }
         });
     }
@@ -66,6 +68,8 @@ public class JsonPathUIController {
                     JsonElement elem = gson.fromJson(resultStr, JsonElement.class);
                     if (!elem.isJsonPrimitive())
                         resultStr = gson.toJson(elem);
+                    else if (((JsonPrimitive) elem).isString())
+                        resultStr = "\"" + resultStr + "\"";
                 } catch (Exception ignored) {
                     resultStr = "\"" + resultStr + "\"";
                 }

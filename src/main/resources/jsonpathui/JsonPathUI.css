@@ -1,10 +1,6 @@
-#jsonText, #result {
-    -fx-font-family: 'System Regular';
-    -fx-font-size: 13;
-}
-
-#jsonPath {
-    -fx-font-size: 13;
+#jsonText, #result, #jsonPath {
+    -fx-font-family: 'Consolas';
+    -fx-font-size: 14;
 }
 
 .json-property {
