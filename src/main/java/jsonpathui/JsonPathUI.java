@@ -10,6 +10,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class JsonPathUI extends Application {
@@ -29,7 +30,9 @@ public class JsonPathUI extends Application {
         createButtonNewTab(tabPane);
 
         anchorPane.getChildren().add(tabPane);
-        Scene scene = new Scene(anchorPane, 700, 700);
+        URL cssResource = JsonPathUI.class.getResource("JsonPathUI.css");
+        Scene scene = new Scene(anchorPane, 1000, 700);
+        scene.getStylesheets().add(cssResource.toExternalForm());
         stage.setTitle("JsonPathUI");
         stage.setScene(scene);
         stage.show();

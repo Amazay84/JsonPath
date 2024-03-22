@@ -5,7 +5,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import jsonPath.JsonPath;
+import org.fxmisc.richtext.CodeArea;
+import static jsonpathui.StyleJson.highlight;
 
 public class JsonPathUIController {
 
@@ -13,65 +16,70 @@ public class JsonPathUIController {
     private TextField jsonPath;
 
     @FXML
-    private TextArea jsonText;
+    private CodeArea jsonText;
 
     @FXML
-    private TextArea result;
+    private CodeArea result;
 
     private JsonElement json;
 
+    private Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
     @FXML
     void initialize() {
-        result.setText("Ведите Json!");
-        result.setEditable(false);
-        jsonText.setStyle("-fx-font-size: 13");
-        result.setStyle("-fx-font-size: 13");
+        result.replaceText("Ведите Json!");
+        jsonText.setStyle("-fx-font-family: 'System Regular'; -fx-font-size: 13");
+        result.setStyle("-fx-font-family: 'System Regular';-fx-font-size: 13");
         jsonPath.setStyle("-fx-font-size: 13");
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         jsonText.textProperty().addListener((observable, oldValue, newValue) -> listnerJson(gson, newValue));
-        jsonPath.setOnKeyTyped(keyEvent -> listnerJsonPath(gson));
+        jsonPath.setOnKeyTyped(keyEvent -> listnerJsonPath());
+        jsonPath.addEventFilter(MouseEvent.MOUSE_PRESSED, mouseEvent -> {
+            if (json != null) {
+                String prettyJson = gson.toJson(json);
+                jsonText.replaceText(prettyJson);
+                //jsonText.setStyleSpans(0, highlight(prettyJson));
+            }
+        });
     }
-
 
     private void listnerJson(Gson gson, String newValue) {
-        {
-            result.setText("");
-            try {
-                json = gson.fromJson(newValue, JsonElement.class);
-            } catch (Exception e) {
-                result.setText("Не валидный верный Json!");
-                return;
-            }
-            if (json != null) {
-                if (!jsonPath.getText().isEmpty())
-                    listnerJsonPath(gson);
-                else
-                    result.setText("Ведите JsonPath!");
-            } else
-                result.setText("Ведите Json!");
+        try {
+            json = gson.fromJson(newValue, JsonElement.class);
+            jsonText.setStyleSpans(0, highlight(newValue));
+        } catch (Exception e) {
+            json = null;
+            result.replaceText("Не валидный верный Json!");
+            return;
         }
+        if (json != null && !json.isJsonNull()) {
+            if (!jsonPath.getText().isEmpty())
+                listnerJsonPath();
+            else
+                result.replaceText("Ведите JsonPath!");
+        } else
+            result.replaceText("Ведите Json!");
     }
 
-    private void listnerJsonPath(Gson gson) {
+    private void listnerJsonPath() {
         if (json != null) {
-            jsonText.setText(gson.toJson(json));
             try {
-                Gson gsonResult = new GsonBuilder().setPrettyPrinting().create();
                 String resultStr = JsonPath.getValue(json, jsonPath.getText());
                 try {
-                    JsonElement elem = gsonResult.fromJson(resultStr, JsonElement.class);
+                    JsonElement elem = gson.fromJson(resultStr, JsonElement.class);
                     if (!elem.isJsonPrimitive())
-                        resultStr = gsonResult.toJson(elem);
+                        resultStr = gson.toJson(elem);
                 } catch (Exception ignored) {
+                    resultStr = "\"" + resultStr + "\"";
                 }
-                result.setText(resultStr);
+                result.replaceText(resultStr);
+                result.setStyleSpans(0, highlight(resultStr));
             } catch (Exception e) {
                 if (e.getMessage() != null)
-                    result.setText(e.getMessage());
+                    result.replaceText(e.getMessage());
                 else if (!jsonPath.getText().isEmpty())
-                    result.setText("Не валидный JsonPath!");
+                    result.replaceText("Не валидный JsonPath!");
                 else
-                    result.setText("Ведите JsonPath!");
+                    result.replaceText("Ведите JsonPath!");
             }
         }
 
