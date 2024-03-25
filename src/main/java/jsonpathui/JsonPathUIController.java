@@ -6,10 +6,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import jsonPath.JsonPath;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
+
 
 import static jsonpathui.StyleJson.highlight;
 
@@ -31,6 +32,10 @@ public class JsonPathUIController {
 
     @FXML
     void initialize() {
+        addContextMenu(jsonText);
+        addContextMenu(result);
+        addEventKeyCombination(jsonText);
+        addEventKeyCombination(result);
         jsonText.setParagraphGraphicFactory(LineNumberFactory.get(jsonText));
         result.setParagraphGraphicFactory(LineNumberFactory.get(result));
         result.replaceText("Ведите Json!");
@@ -44,6 +49,45 @@ public class JsonPathUIController {
                 jsonText.setStyleSpans(0, highlight(prettyJson));
             }
         });
+    }
+
+    private void addEventKeyCombination(CodeArea codeArea) {
+        KeyCombination C_c = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
+        KeyCombination C_v = new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN);
+        KeyCombination C_a = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
+        KeyCombination C_z = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
+        KeyCombination C_x = new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
+        KeyCombination C_S_z = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
+        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
+            if (C_c.match(evt))
+                jsonText.copy();
+            else if (C_v.match(evt))
+                jsonText.paste();
+            else if (C_a.match(evt))
+                jsonText.selectAll();
+            else if (C_x.match(evt))
+                jsonText.cut();
+            else if (C_z.match(evt))
+                jsonText.undo();
+            else if (C_S_z.match(evt))
+                jsonText.redo();
+        });
+    }
+    private void addContextMenu(CodeArea codeArea) {
+        ContextMenu contextMenu = new ContextMenu();
+        addActionToContextMenu(contextMenu, "Copy", codeArea::copy);
+        addActionToContextMenu(contextMenu, "Paste", codeArea::paste);
+        addActionToContextMenu(contextMenu, "Cut", codeArea::cut);
+        addActionToContextMenu(contextMenu, "Select all", codeArea::selectAll);
+        addActionToContextMenu(contextMenu, "Undo", codeArea::undo);
+        addActionToContextMenu(contextMenu, "Redo", codeArea::redo);
+        codeArea.setContextMenu(contextMenu);
+    }
+
+    private void addActionToContextMenu(ContextMenu contextMenu, String name, RunFunction supplier) {
+        MenuItem item = new MenuItem(name);
+        contextMenu.getItems().add(item);
+        item.setOnAction(event -> supplier.run());
     }
 
     private void listnerJson(Gson gson, String newValue) {
@@ -89,5 +133,11 @@ public class JsonPathUIController {
             }
         }
 
+    }
+
+    @FunctionalInterface
+    public interface RunFunction {
+
+        void run();
     }
 }
