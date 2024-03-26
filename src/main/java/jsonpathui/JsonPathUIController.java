@@ -59,17 +59,17 @@ public class JsonPathUIController {
         KeyCombination C_x = new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
         KeyCombination C_S_z = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
-            if (C_c.match(evt))
+            if (C_c.match(evt) && evt.getText().charAt(0) != 'c')
                 jsonText.copy();
-            else if (C_v.match(evt))
+            else if (C_v.match(evt) && evt.getText().charAt(0) != 'v')
                 jsonText.paste();
-            else if (C_a.match(evt))
+            else if (C_a.match(evt) && evt.getText().charAt(0) != 'a')
                 jsonText.selectAll();
-            else if (C_x.match(evt))
+            else if (C_x.match(evt) && evt.getText().charAt(0) != 'x')
                 jsonText.cut();
-            else if (C_z.match(evt))
+            else if (C_z.match(evt) && evt.getText().charAt(0) != 'z')
                 jsonText.undo();
-            else if (C_S_z.match(evt))
+            else if (C_S_z.match(evt) && evt.getText().charAt(0) != 'z')
                 jsonText.redo();
         });
     }
