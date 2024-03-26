@@ -32,6 +32,7 @@ public class JsonPathUIController {
 
     @FXML
     void initialize() {
+        result.editableProperty().set(false);
         addContextMenu(jsonText);
         addContextMenu(result);
         addEventKeyCombination(jsonText);
@@ -58,34 +59,45 @@ public class JsonPathUIController {
         KeyCombination C_z = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
         KeyCombination C_x = new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
         KeyCombination C_S_z = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
-        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
-            if (C_c.match(evt) && evt.getText().charAt(0) != 'c')
-                jsonText.copy();
-            else if (C_v.match(evt) && evt.getText().charAt(0) != 'v')
-                jsonText.paste();
-            else if (C_a.match(evt) && evt.getText().charAt(0) != 'a')
-                jsonText.selectAll();
-            else if (C_x.match(evt) && evt.getText().charAt(0) != 'x')
-                jsonText.cut();
-            else if (C_z.match(evt) && evt.getText().charAt(0) != 'z')
-                jsonText.undo();
-            else if (C_S_z.match(evt) && evt.getText().charAt(0) != 'z')
-                jsonText.redo();
-        });
+        if (codeArea.isEditable())
+            codeArea.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
+                if (C_c.match(evt) && evt.getText().charAt(0) != 'c')
+                    jsonText.copy();
+                else if (C_v.match(evt) && evt.getText().charAt(0) != 'v')
+                    jsonText.paste();
+                else if (C_a.match(evt) && evt.getText().charAt(0) != 'a')
+                    jsonText.selectAll();
+                else if (C_x.match(evt) && evt.getText().charAt(0) != 'x')
+                    jsonText.cut();
+                else if (C_z.match(evt) && evt.getText().charAt(0) != 'z')
+                    jsonText.undo();
+                else if (C_S_z.match(evt) && evt.getText().charAt(0) != 'z')
+                    jsonText.redo();
+            });
+        else
+            codeArea.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
+                if (C_c.match(evt) && evt.getText().charAt(0) != 'c')
+                    jsonText.copy();
+                else if (C_a.match(evt) && evt.getText().charAt(0) != 'a')
+                    jsonText.selectAll();
+            });
     }
+
     private void addContextMenu(CodeArea codeArea) {
         ContextMenu contextMenu = new ContextMenu();
-        addActionToContextMenu(contextMenu, "Copy", codeArea::copy);
-        addActionToContextMenu(contextMenu, "Paste", codeArea::paste);
-        addActionToContextMenu(contextMenu, "Cut", codeArea::cut);
-        addActionToContextMenu(contextMenu, "Select all", codeArea::selectAll);
-        addActionToContextMenu(contextMenu, "Undo", codeArea::undo);
-        addActionToContextMenu(contextMenu, "Redo", codeArea::redo);
+        addActionToContextMenu(contextMenu, "Copy", codeArea::copy, true);
+        addActionToContextMenu(contextMenu, "Paste", codeArea::paste, codeArea.isEditable());
+        addActionToContextMenu(contextMenu, "Cut", codeArea::cut, codeArea.isEditable());
+        addActionToContextMenu(contextMenu, "Select all", codeArea::selectAll, true);
+        addActionToContextMenu(contextMenu, "Undo", codeArea::undo, codeArea.isEditable());
+        addActionToContextMenu(contextMenu, "Redo", codeArea::redo, codeArea.isEditable());
         codeArea.setContextMenu(contextMenu);
     }
 
-    private void addActionToContextMenu(ContextMenu contextMenu, String name, RunFunction supplier) {
+    private void addActionToContextMenu(ContextMenu contextMenu, String name, RunFunction supplier, boolean isEdit) {
         MenuItem item = new MenuItem(name);
+        if (!isEdit)
+            item.setDisable(true);
         contextMenu.getItems().add(item);
         item.setOnAction(event -> supplier.run());
     }
@@ -133,6 +145,18 @@ public class JsonPathUIController {
             }
         }
 
+    }
+
+    public TextField getJsonPath() {
+        return jsonPath;
+    }
+
+    public CodeArea getJsonText() {
+        return jsonText;
+    }
+
+    public CodeArea getResult() {
+        return result;
     }
 
     @FunctionalInterface

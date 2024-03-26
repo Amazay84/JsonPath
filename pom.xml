@@ -6,7 +6,7 @@
 
     <groupId>JsonPathUI</groupId>
     <artifactId>JsonPathUI</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
     <name>jsonpathui.JsonPathUI</name>
 
     <properties>
@@ -47,7 +47,7 @@
             <artifactId>jsonPath</artifactId>
             <version>3.1</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/jsonPath-3.1.jar</systemPath>
+            <systemPath>${project.basedir}/lib/jsonPath-3.2.jar</systemPath>
         </dependency>
 
     </dependencies>
