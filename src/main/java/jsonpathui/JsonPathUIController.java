@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
@@ -40,15 +41,11 @@ public class JsonPathUIController {
         jsonText.setParagraphGraphicFactory(LineNumberFactory.get(jsonText));
         result.setParagraphGraphicFactory(LineNumberFactory.get(result));
         result.replaceText("Ведите Json!");
-        jsonText.textProperty().addListener((observable, oldValue, newValue) -> listnerJson(gson, newValue));
+        jsonText.textProperty().addListener((observable, oldValue, newValue) -> listnerJson(newValue));
         jsonPath.setOnKeyTyped(keyEvent -> listnerJsonPath());
-        jsonPath.addEventFilter(MouseEvent.MOUSE_PRESSED, mouseEvent -> {
-            if (jsonNew != null && jsonNew != jsonOld) {
-                String prettyJson = gson.toJson(jsonNew);
-                jsonText.replaceText(prettyJson);
-                jsonOld = jsonNew;
-                jsonText.setStyleSpans(0, highlight(prettyJson));
-            }
+        jsonText.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != oldVal)
+                formatterJsonText();
         });
     }
 
@@ -58,6 +55,7 @@ public class JsonPathUIController {
         KeyCombination C_a = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
         KeyCombination C_z = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
         KeyCombination C_x = new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
+        KeyCombination C_f = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
         KeyCombination C_S_z = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
         if (codeArea.isEditable())
             codeArea.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
@@ -73,6 +71,8 @@ public class JsonPathUIController {
                     jsonText.undo();
                 else if (C_S_z.match(evt) && evt.getText().charAt(0) != 'z')
                     jsonText.redo();
+                else if (C_f.match(evt) || (C_f.match(evt) && evt.getText().charAt(0) != 'f'))
+                    formatterJsonText();
             });
         else
             codeArea.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
@@ -83,6 +83,15 @@ public class JsonPathUIController {
             });
     }
 
+    private void formatterJsonText() {
+        if (jsonNew != null && jsonNew != jsonOld) {
+            String prettyJson = gson.toJson(jsonNew);
+            jsonText.replaceText(prettyJson);
+            jsonOld = jsonNew;
+            jsonText.setStyleSpans(0, highlight(prettyJson));
+        }
+    }
+
     private void addContextMenu(CodeArea codeArea) {
         ContextMenu contextMenu = new ContextMenu();
         addActionToContextMenu(contextMenu, "Copy", codeArea::copy, true);
@@ -91,6 +100,7 @@ public class JsonPathUIController {
         addActionToContextMenu(contextMenu, "Select all", codeArea::selectAll, true);
         addActionToContextMenu(contextMenu, "Undo", codeArea::undo, codeArea.isEditable());
         addActionToContextMenu(contextMenu, "Redo", codeArea::redo, codeArea.isEditable());
+        addActionToContextMenu(contextMenu, "Formatter", this::formatterJsonText, codeArea.isEditable());
         codeArea.setContextMenu(contextMenu);
     }
 
@@ -102,7 +112,7 @@ public class JsonPathUIController {
         item.setOnAction(event -> supplier.run());
     }
 
-    private void listnerJson(Gson gson, String newValue) {
+    private void listnerJson(String newValue) {
         try {
             jsonNew = gson.fromJson(newValue, JsonElement.class);
             jsonText.setStyleSpans(0, highlight(newValue));
@@ -153,10 +163,6 @@ public class JsonPathUIController {
 
     public CodeArea getJsonText() {
         return jsonText;
-    }
-
-    public CodeArea getResult() {
-        return result;
     }
 
     @FunctionalInterface

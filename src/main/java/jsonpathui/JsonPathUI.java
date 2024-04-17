@@ -39,7 +39,7 @@ public class JsonPathUI extends Application {
         Image image = new Image(JsonPathUI.class.getResource("JsonPathUI_icon.png").toString());
         Scene scene = new Scene(anchorPane, 1000, 700);
         scene.getStylesheets().add(cssResource.toExternalForm());
-        stage.setTitle("JsonPathUI");
+        stage.setTitle("JsonPathUI 1.4");
         stage.getIcons().add(image);
         stage.setScene(scene);
         stage.setOnCloseRequest(event -> writeState());
@@ -55,7 +55,6 @@ public class JsonPathUI extends Application {
                 JsonPathUIController controller = controllersList.get(newTab);
                 controller.getJsonPath().setText(stateScene.getJsonPath());
                 controller.getJsonText().replaceText(stateScene.getJson());
-                controller.getResult().replaceText(stateScene.getResult());
             }
         } catch (Exception e) {
             createTab("Tab 1", false);
@@ -68,7 +67,6 @@ public class JsonPathUI extends Application {
             if (!tab.getText().equals("+")) {
                 JsonPathUIController controller = controllersList.get(tab);
                 stateScenes.add(new StateScene(controller.getJsonText().getText(),
-                        controller.getResult().getText(),
                         controller.getJsonPath().getText(),
                         tab.getText()));
             }
@@ -132,13 +130,24 @@ public class JsonPathUI extends Application {
         rename.setOnAction(event -> {
             tab.setGraphic(textField);
             tab.setText("");
+            tab.setText(tab.getText());
             textField.selectAll();
             textField.requestFocus();
         });
+        textField.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                if (!textField.getText().isEmpty()) {
+                    tab.setText(textField.getText());
+                    tab.setGraphic(null);
+                }
+            }
+        });
         textField.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
-                tab.setText(textField.getText());
-                tab.setGraphic(null);
+                if (!textField.getText().isEmpty()) {
+                    tab.setText(textField.getText());
+                    tab.setGraphic(null);
+                }
             }
         });
     }
