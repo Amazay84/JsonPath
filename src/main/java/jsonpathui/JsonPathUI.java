@@ -128,9 +128,9 @@ public class JsonPathUI extends Application {
         tab.setContextMenu(contextMenu);
         textField.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 13;");
         rename.setOnAction(event -> {
+            textField.setText(tab.getText());
             tab.setGraphic(textField);
             tab.setText("");
-            tab.setText(tab.getText());
             textField.selectAll();
             textField.requestFocus();
         });
