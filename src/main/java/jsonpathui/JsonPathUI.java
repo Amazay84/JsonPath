@@ -39,7 +39,7 @@ public class JsonPathUI extends Application {
         Image image = new Image(JsonPathUI.class.getResource("JsonPathUI_icon.png").toString());
         Scene scene = new Scene(anchorPane, 1000, 700);
         scene.getStylesheets().add(cssResource.toExternalForm());
-        stage.setTitle("JsonPathUI 1.4");
+        stage.setTitle("JsonPathUI 1.5");
         stage.getIcons().add(image);
         stage.setScene(scene);
         stage.setOnCloseRequest(event -> writeState());
